@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💑 Praga FLAMES</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="card">
+    <h2>💑 Praga FLAMES Calculator</h2>
+    <form id="flamesForm">
+      <label>Boy Name</label>
+      <input type="text" id="boyName" required>
+      <label>Boy DOB</label>
+      <input type="date" id="boyDob" required>
+
+      <label>Girl Name</label>
+      <input type="text" id="girlName" required>
+      <label>Girl DOB</label>
+      <input type="date" id="girlDob" required>
+
+      <button type="submit" class="primary">Calculate</button>
+      <button type="button" id="resetBtn" class="secondary">Reset</button>
+    </form>
+
+    <div class="result" id="result">Result will appear here…</div>
+  </div>
+
+  <script>
+    function sanitize(str) {
+      return (str || "").toLowerCase().replace(/[^a-z]/g, "");
+    }
+
+    function remainingCount(a, b) {
+      let arrA = a.split(""), arrB = b.split("");
+      for (let i = 0; i < arrA.length; i++) {
+        let j = arrB.indexOf(arrA[i]);
+        if (j !== -1) { arrA[i] = "#"; arrB[j] = "#"; }
+      }
+      return arrA.filter(c => c !== "#").length + arrB.filter(c => c !== "#").length;
+    }
+
+    function flames(count) {
+      let list = ["F","L","A","M","E","S"], idx = 0;
+      while (list.length > 1) {
+        idx = (idx + count - 1) % list.length;
+        list.splice(idx, 1);
+      }
+      return list[0];
+    }
+
+    function meaning(letter) {
+      const map = {F:"Friends",L:"Love",A:"Affection",M:"Marriage",E:"Enemies",S:"Siblings"};
+      return map[letter] || "?";
+    }
+
+    document.getElementById("flamesForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const boyName = sanitize(document.getElementById("boyName").value);
+      const girlName = sanitize(document.getElementById("girlName").value);
+      const boyDob = new Date(document.getElementById("boyDob").value);
+      const girlDob = new Date(document.getElementById("girlDob").value);
+      const resEl = document.getElementById("result");
+
+      if (!boyName || !girlName || isNaN(boyDob) || isNaN(girlDob)) {
+        resEl.textContent = "⚠ Please fill all fields correctly.";
+        return;
+      }
+
+      if (boyDob > girlDob) {
+        resEl.textContent = "👫 Result: S = Siblings (Brother–Sister)";
+        return;
+      }
+
+      const count = remainingCount(boyName, girlName);
+      if (count === 0) {
+        resEl.textContent = "Both names cancel out completely.";
+        return;
+      }
+
+      const letter = flames(count);
+      resEl.textContent = `🔥 Result: ${letter} = ${meaning(letter)} (count = ${count})`;
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", function() {
+      document.getElementById("flamesForm").reset();
+      document.getElementById("result").textContent = "Result will appear here…";
+    });
+  </script>
+</body>
+</html>
